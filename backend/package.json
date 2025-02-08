@@ -21,7 +21,6 @@
     "mongoose": "^8.10.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9",
-    "proxy": "http://localhost:5000"
+    "nodemon": "^3.1.9"
   }
 }

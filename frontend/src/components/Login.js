@@ -19,6 +19,9 @@ import {
 import { Email, Lock } from "@mui/icons-material";
 
 const Login = () => {
+  const API_BASE_URL =
+    process.env.REACT_APP_API_URL || "https://event-n0mx.onrender.com";
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -39,10 +42,7 @@ const Login = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        formData
-      );
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, formData);
       console.log(res.data); // Handle success (e.g., save token, redirect to dashboard)
       navigate("/dashboard");
     } catch (err) {
@@ -71,8 +71,7 @@ const Login = () => {
   const handleResetSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Replace with your API endpoint for sending reset link
-      await axios.post("http://localhost:5000/api/auth/reset-password", {
+      await axios.post(`${API_BASE_URL}/api/auth/reset-password`, {
         email: emailForReset,
       });
       alert("Reset link sent to your email!"); // You can replace this with a snackbar or alert

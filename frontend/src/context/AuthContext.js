@@ -6,8 +6,11 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
+  const API_BASE_URL =
+    process.env.REACT_APP_API_URL || "https://event-n0mx.onrender.com";
+
   const login = async (username, password) => {
-    const response = await axios.post("http://localhost:5000/api/auth/login", {
+    const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
       username,
       password,
     });

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Container,
   Typography,
@@ -17,15 +18,14 @@ import {
   Toolbar,
   IconButton,
   Menu,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
 } from "@mui/material";
 import { Add, Logout, Edit, Delete, AccountCircle } from "@mui/icons-material";
 import "./Dashboard.css";
 
 const Dashboard = () => {
+  const API_BASE_URL =
+    process.env.REACT_APP_API_URL || "https://event-n0mx.onrender.com";
+
   const [events, setEvents] = useState([]);
   const [newEvent, setNewEvent] = useState({
     name: "",
@@ -35,7 +35,7 @@ const Dashboard = () => {
     category: "",
   });
 
-  const [editingEventId, setEditingEventId] = useState(null); // Track which event is being edited
+  const [editingEventId, setEditingEventId] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,6 +52,14 @@ const Dashboard = () => {
     "Tech Talk",
   ];
 
+  // ✅ Fetch events from backend on component mount
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}/api/events`)
+      .then((response) => setEvents(response.data))
+      .catch((error) => console.error("Error fetching events:", error));
+  }, []);
+
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = "/login";
@@ -62,7 +70,7 @@ const Dashboard = () => {
     setNewEvent({ ...newEvent, [name]: value });
   };
 
-  const handleAddOrUpdateEvent = () => {
+  const handleAddOrUpdateEvent = async () => {
     if (
       !newEvent.name ||
       !newEvent.description ||
@@ -72,22 +80,32 @@ const Dashboard = () => {
     )
       return;
 
-    if (editingEventId !== null) {
-      // If editing an existing event
-      setEvents(
-        events.map((event) =>
-          event.id === editingEventId
-            ? { ...newEvent, id: editingEventId }
-            : event
-        )
-      );
-      setEditingEventId(null);
-    } else {
-      // If adding a new event
-      setEvents([...events, { ...newEvent, id: Date.now(), attendees: [] }]);
+    try {
+      if (editingEventId) {
+        // ✅ Update event in backend
+        const response = await axios.put(
+          `${API_BASE_URL}/api/events/${editingEventId}`,
+          newEvent
+        );
+        setEvents(
+          events.map((event) =>
+            event._id === editingEventId ? response.data : event
+          )
+        );
+        setEditingEventId(null);
+      } else {
+        // ✅ Add new event to backend
+        const response = await axios.post(
+          `${API_BASE_URL}/api/events`,
+          newEvent
+        );
+        setEvents([...events, response.data]);
+      }
+    } catch (error) {
+      console.error("Error adding/updating event:", error);
     }
 
-    // Reset the form
+    // Reset form
     setNewEvent({
       name: "",
       description: "",
@@ -98,13 +116,18 @@ const Dashboard = () => {
     setShowCreateForm(false);
   };
 
-  const handleDeleteEvent = (id) => {
-    setEvents(events.filter((event) => event.id !== id));
+  const handleDeleteEvent = async (id) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/api/events/${id}`);
+      setEvents(events.filter((event) => event._id !== id));
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
   };
 
   const handleEditEvent = (event) => {
     setNewEvent(event);
-    setEditingEventId(event.id);
+    setEditingEventId(event._id);
     setShowCreateForm(true);
   };
 
@@ -245,15 +268,12 @@ const Dashboard = () => {
 
         <Grid container spacing={2}>
           {filteredEvents.map((event) => (
-            <Grid item xs={12} sm={6} md={4} key={event.id}>
+            <Grid item xs={12} sm={6} md={4} key={event._id}>
               <Card className="event-card">
                 <CardContent>
                   <Typography variant="h5">{event.name}</Typography>
                   <Typography>
                     {event.date} | {event.category}
-                  </Typography>
-                  <Typography variant="body2">
-                    Attendees: {event.attendees.length}
                   </Typography>
                 </CardContent>
                 <CardActions>
@@ -267,7 +287,7 @@ const Dashboard = () => {
                   <Button
                     size="small"
                     color="secondary"
-                    onClick={() => handleDeleteEvent(event.id)}
+                    onClick={() => handleDeleteEvent(event._id)}
                   >
                     <Delete />
                   </Button>

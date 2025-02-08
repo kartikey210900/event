@@ -18,6 +18,9 @@ import {
 } from "@mui/material";
 
 const Signup = () => {
+  const API_BASE_URL =
+    process.env.REACT_APP_API_URL || "https://event-n0mx.onrender.com";
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -40,7 +43,7 @@ const Signup = () => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        `${API_BASE_URL}/api/auth/register`,
         formData
       );
       console.log(res.data); // Handle success (e.g., redirect to login)
@@ -200,7 +203,7 @@ const Signup = () => {
           }}
         >
           <Typography id="modal-title" variant="h6" component="h2">
-            {success ? "Registration Successful!" : "User  Already Exists"}
+            {success ? "Registration Successful!" : "User Already Exists"}
           </Typography>
           <Typography id="modal-description" sx={{ mt: 2 }}>
             {success

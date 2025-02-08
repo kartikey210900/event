@@ -18,13 +18,16 @@ app.use("/api", adminRoutes);
 app.use("/api/events", eventRoutes); // Add event routes
 
 // Connect to MongoDB
+
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.log(err));
+  .then(() => console.log("✅ MongoDB connected successfully"))
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err);
+  });
 
 // Basic route
 app.get("/", (req, res) => {

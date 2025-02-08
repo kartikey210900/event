@@ -22,7 +22,7 @@ A full-stack event management application with user authentication, event creati
 
 ### 1️⃣ Clone the Repository  
 ```bash
-git clone [https://github.com/yourusername/event-management-app.git](https://github.com/kartikey210900/event.git)
+git clone https://github.com/kartikey210900/event.git
 cd event-management-app
 ```
 
@@ -30,7 +30,7 @@ cd event-management-app
 ```bash
 cd backend
 npm install
-npm start  # Runs on http://localhost:5000](https://event-n0mx.onrender.com
+npm start  https://event-n0mx.onrender.com
 ```
 
 #### Environment Variables (`.env` file)  
@@ -43,7 +43,7 @@ JWT_SECRET=your_secret_key
 ```bash
 cd frontend
 npm install
-npm run dev  # Runs on [http://localhost:5173](https://event-one-rho.vercel.app/login)
+npm run dev  https://event-one-rho.vercel.app/login
 ```
 
 ## 🔑 Test Credentials  
